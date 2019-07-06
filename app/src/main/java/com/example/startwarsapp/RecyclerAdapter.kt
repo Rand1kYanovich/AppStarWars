@@ -20,15 +20,11 @@ import com.example.startwarsapp.model.entity.InfoPageAndResult
 class RecyclerAdapter :
     PagedListAdapter<FullInfoCard, RecyclerViewHolder>(FullInfoCard.diffCalback) {
 
-    private var cardsList:ArrayList<FullInfoCard>?=null
     private lateinit var colorArray:Array<String>
     private lateinit var listener: OnItemClickListener
     private var i:Int = 0
 
-    init {
-        val paramsMsg:LinearLayout.LayoutParams  = LinearLayout.LayoutParams(300,450)
-        paramsMsg.gravity = Gravity.CENTER
-    }
+
 
 
 

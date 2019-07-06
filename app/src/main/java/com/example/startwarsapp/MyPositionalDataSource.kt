@@ -1,5 +1,7 @@
 package com.example.startwarsapp
 
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.paging.PageKeyedDataSource
 import android.arch.paging.PagedList
 import android.arch.paging.PositionalDataSource
@@ -17,21 +19,37 @@ class MyPositionalDataSource: PageKeyedDataSource<String, FullInfoCard>() {
 
     var infoPageAndResult: InfoPageAndResult? = null
     var cardsList: MutableList<FullInfoCard>? = null
+    var filter:String?= null
+
+
+    companion object{
+        private lateinit var filter:String
+        fun setFilter(filter:String){
+            this.filter = filter
+        }
+    }
 
 
 
-    //Функция для первой подгрузки элементов
-    override fun loadInitial(params: LoadInitialParams<String>, callback: LoadInitialCallback<String, FullInfoCard>) {
+        //Функция для первой подгрузки элементов
+        override fun loadInitial(
+            params: LoadInitialParams<String>,
+            callback: LoadInitialCallback<String, FullInfoCard>
+        ) {
+
+            if (filter == null) filter = ""
+            Log.e("Req", filter+"fff")
 
             NetworkService.getInstance()
                 .getJSONApi()
-                .getCards("1")
+                .getCards("1", filter!!)
                 .enqueue(object : Callback<InfoPageAndResult> {
                     override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
                     }
 
                     override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
                         if (response.isSuccessful) {
+                            Log.e("Req", call.request().toString())
                             infoPageAndResult = response.body()
                             cardsList = ArrayList(infoPageAndResult!!.results)
                             callback.onResult(cardsList!!, null, "2")
@@ -39,49 +57,47 @@ class MyPositionalDataSource: PageKeyedDataSource<String, FullInfoCard>() {
                     }
                 })
 
-    }
+        }
 
-    //Динамическая загрузка следующих n элементов с другой страницы.(N указывается в коде)
-    override fun loadAfter(params: LoadParams<String>, callback: LoadCallback<String, FullInfoCard>) {
+
+        //Динамическая загрузка следующих n элементов с другой страницы.(N указывается в коде)
+        override fun loadAfter(params: LoadParams<String>, callback: LoadCallback<String, FullInfoCard>) {
+            if (filter == null) filter = ""
+
+            loadData(params,callback,(params.key.toInt() + 1).toString())
+
+
+        }
+
+
+        //Пока не нужна,но надо будет использовать
+        override fun loadBefore(params: LoadParams<String>, callback: LoadCallback<String, FullInfoCard>) {
+            loadData(params,callback,(params.key.toInt() + (-1)).toString())
+        }
+
+
+    fun loadData(params: LoadParams<String>, callback: LoadCallback<String, FullInfoCard>,key:String){
         NetworkService.getInstance()
             .getJSONApi()
-            .getCards((params.key).toString())
-            .enqueue(object: Callback<InfoPageAndResult> {
+            .getCards((params.key).toString(), "")
+            .enqueue(object : Callback<InfoPageAndResult> {
                 override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
                 }
 
                 override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
-                    if(response.isSuccessful){
+                    if (response.isSuccessful) {
                         infoPageAndResult = response.body()
                         cardsList = ArrayList(infoPageAndResult!!.results)
-                        callback.onResult(cardsList!!,(params.key.toInt()+1).toString())
+                        callback.onResult(cardsList!!, key)
                     }
                 }
             })
     }
-
-
-//Пока не нужна,но надо будет использовать
-    override fun loadBefore(params: LoadParams<String>, callback: LoadCallback<String, FullInfoCard>) {
-        NetworkService.getInstance()
-            .getJSONApi()
-            .getCards((params.key).toString())
-            .enqueue(object: Callback<InfoPageAndResult> {
-                override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
-                }
-
-                override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
-                    if(response.isSuccessful){
-                        infoPageAndResult = response.body()
-                        cardsList = ArrayList(infoPageAndResult!!.results)
-                        callback.onResult(cardsList!!,params.key+(-1))
-                    }
-                }
-            })
     }
 
 
 
-}
+
+
 
 

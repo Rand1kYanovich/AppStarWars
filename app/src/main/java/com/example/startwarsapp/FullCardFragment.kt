@@ -27,7 +27,7 @@ class FullCardFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView:View = inflater.inflate(R.layout.fragment_full_card,container,false)
 
-        fullCardObject = arguments!!.getSerializable("fullInfo") as FullInfoCard?
+        fullCardObject = arguments!!.getSerializable(getString(R.string.bundle_argument_name)) as FullInfoCard?
 
         clCard = rootView.findViewById(R.id.clCard)
         clCard.setBackgroundColor(Color.parseColor(fullCardObject!!.color))

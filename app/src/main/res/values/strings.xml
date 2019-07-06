@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">StartWarsApp</string>
+    <string name="bundle_argument_name">fullInfo</string>
 </resources>

@@ -4,6 +4,7 @@ import android.arch.paging.PagedListAdapter
 import android.content.Context
 import android.graphics.Color
 import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.CoordinatorLayout
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
@@ -15,9 +16,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
+import com.example.startwarsapp.util.CardUtil
 
 
-class RecyclerAdapter constructor(private val cardsList:ArrayList<FullInfoCard>) :
+class RecyclerAdapter constructor(private var cardsList:ArrayList<FullInfoCard>, private val context:Context) :
     RecyclerView.Adapter<RecyclerViewHolder>() {
 
 
@@ -32,7 +34,8 @@ class RecyclerAdapter constructor(private val cardsList:ArrayList<FullInfoCard>)
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): RecyclerViewHolder {
         val layoutView:View = LayoutInflater.from(parent.context).inflate(R.layout.card_item,null,false)
-        val lp: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(300,450)
+        val lp= ConstraintLayout.LayoutParams(pxFromDp(context,300),pxFromDp(context,400))
+        lp.leftMargin = pxFromDp(context,50)
         layoutView.layoutParams = lp
         val rcv = RecyclerViewHolder(layoutView)
 
@@ -42,13 +45,21 @@ class RecyclerAdapter constructor(private val cardsList:ArrayList<FullInfoCard>)
 
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        var item:FullInfoCard = cardsList.get(position)
-        i++
-        if(i >= colorArray.size)i=0
+        val item:FullInfoCard = cardsList.get(position)
         holder.tvName!!.setText(item.name)
-        holder.clCard!!.setBackgroundColor(Color.parseColor(colorArray[i]))
+        if(item.color.equals("")) {
+            if(i >= colorArray.size)i=0
+            holder.clCard!!.setBackgroundColor(Color.parseColor(colorArray[i]))
+            item.color = colorArray[i]
+            holder.btnFavorite!!.setBackgroundColor(Color.parseColor(colorArray[i]))
+            i++
+        }
+        else{
+            holder.clCard!!.setBackgroundColor(Color.parseColor(item.color))
+            holder.btnFavorite!!.setBackgroundColor(Color.parseColor(item.color))
+        }
         holder.bind(position,listener,cardsList)
-        item.color = colorArray[i]
+
 
 
 
@@ -64,21 +75,31 @@ class RecyclerAdapter constructor(private val cardsList:ArrayList<FullInfoCard>)
 
     fun setClickListener(listener: OnItemClickListener) {this.listener = listener}
 
-    fun addData(listItems: ArrayList<FullInfoCard>) {
-        var size = this.cardsList.size
-        this.cardsList.addAll(listItems)
-        var sizeNew = this.cardsList.size
-        notifyItemRangeChanged(size, sizeNew)
+
+
+    fun pxFromDp(context: Context, dp: Int): Int {
+        return ((dp.toFloat()) * context.resources.displayMetrics.density).toInt()
+    }
+
+    fun setList(list:ArrayList<FullInfoCard>){
+        val sizeOld = cardsList.size
+        cardsList = list
+        val sizeNew = CardUtil.cardsList.size
+        notifyItemRangeChanged(sizeOld,sizeNew)
         notifyDataSetChanged()
     }
 
-    fun addDataWithFilter(listItems:ArrayList<FullInfoCard>){
-        var size = this.cardsList.size
-        this.cardsList.removeAll(cardsList)
-        this.cardsList.addAll(listItems)
-        var sizeNew = this.cardsList.size
-        notifyItemRangeChanged(size, sizeNew)
+    fun setListWithRemove(list:ArrayList<FullInfoCard>){
+        val sizeOld = cardsList.size
+        cardsList.removeAll(cardsList)
+        cardsList.addAll(list)
+        val sizeNew = CardUtil.cardsList.size
+        notifyItemRangeChanged(sizeOld,sizeNew)
+        notifyDataSetChanged()
     }
+
+
+
 }
 
 

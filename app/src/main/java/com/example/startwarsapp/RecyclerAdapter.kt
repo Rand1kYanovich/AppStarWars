@@ -17,8 +17,9 @@ import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
 
 
-class RecyclerAdapter :
-    PagedListAdapter<FullInfoCard, RecyclerViewHolder>(FullInfoCard.diffCalback) {
+class RecyclerAdapter constructor(private val cardsList:ArrayList<FullInfoCard>) :
+    RecyclerView.Adapter<RecyclerViewHolder>() {
+
 
     private lateinit var colorArray:Array<String>
     private lateinit var listener: OnItemClickListener
@@ -41,17 +42,21 @@ class RecyclerAdapter :
 
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        val paramsMsg:LinearLayout.LayoutParams  = LinearLayout.LayoutParams(300,450)
+        var item:FullInfoCard = cardsList.get(position)
         i++
         if(i >= colorArray.size)i=0
-        holder.tvName!!.setText(getItem(position)!!.name)
+        holder.tvName!!.setText(item.name)
         holder.clCard!!.setBackgroundColor(Color.parseColor(colorArray[i]))
         holder.bind(position,listener)
-        getItem(position)!!.color = colorArray[i]
+        item.color = colorArray[i]
 
 
 
 
+    }
+
+    override fun getItemCount(): Int {
+        return cardsList.size
     }
 
 
@@ -59,7 +64,21 @@ class RecyclerAdapter :
 
     fun setClickListener(listener: OnItemClickListener) {this.listener = listener}
 
+    fun addData(listItems: ArrayList<FullInfoCard>) {
+        var size = this.cardsList.size
+        this.cardsList.addAll(listItems)
+        var sizeNew = this.cardsList.size
+        notifyItemRangeChanged(size, sizeNew)
+        notifyDataSetChanged()
+    }
 
+    fun addDataWithFilter(listItems:ArrayList<FullInfoCard>){
+        var size = this.cardsList.size
+        this.cardsList.removeAll(cardsList)
+        this.cardsList.addAll(listItems)
+        var sizeNew = this.cardsList.size
+        notifyItemRangeChanged(size, sizeNew)
+    }
 }
 
 

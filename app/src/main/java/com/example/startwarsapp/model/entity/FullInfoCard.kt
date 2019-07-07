@@ -15,6 +15,7 @@ class FullInfoCard :Serializable{
     var gender:String = ""
     var color:String = ""
     var favorites:Boolean = false
+    var searcheable:String = ""
 
 
     companion object{

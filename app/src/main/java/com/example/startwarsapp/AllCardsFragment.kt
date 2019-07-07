@@ -20,6 +20,7 @@ import com.example.startwarsapp.model.api.NetworkService
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
 import com.example.startwarsapp.util.FragmentUtil
+import com.example.startwarsapp.util.RequestsUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,11 +32,13 @@ class AllCardsFragment: Fragment() {
 
     val clickListener: OnItemClickListener
     lateinit var colorArray: Array<String>
+    var layoutManager = LinearLayoutManager(context)
+    var isLastPage: Boolean = false
+    var isLoading: Boolean = false
+    var page:Int = 1
+    var filter:String = ""
 
-
-    var factory:MyPositionalDataSourceFactory = MyPositionalDataSourceFactory()
-    var config: PagedList.Config? = null
-    var cardsList: LiveData<PagedList<FullInfoCard>>? = null
+    var cardsList: ArrayList<FullInfoCard>?=null
 
 
 
@@ -44,21 +47,11 @@ class AllCardsFragment: Fragment() {
             override fun onClick(view: View, position: Int) {
                 val fullCardFragment: FullCardFragment = FullCardFragment()
                 val bundle: Bundle = Bundle()
-                bundle.putSerializable(getString(R.string.bundle_argument_name), cardsList!!.value!![position])
+                bundle.putSerializable(getString(R.string.bundle_argument_name), cardsList!!.get(position))
                 fullCardFragment.arguments = bundle
                 FragmentUtil.replaceWithBackStack(activity!!.supportFragmentManager, R.id.container, fullCardFragment)
             }
         }
-
-
-        config = PagedList.Config.Builder()
-            .setEnablePlaceholders(false)
-            .setPageSize(5)
-            .setPrefetchDistance(9)
-            .setInitialLoadSizeHint(5)
-            .build()
-
-
     }
 
 
@@ -69,43 +62,122 @@ class AllCardsFragment: Fragment() {
 
 
         etSearch = rootView.findViewById(R.id.etSearch)
-        setListenerEditText()
         colorArray = resources.getStringArray(R.array.card_color)
-        cardsList = LivePagedListBuilder<String,FullInfoCard>(factory,config!!).build()
-        cardsList!!.observe(this, Observer {
-            it.let { adapter.submitList(it) }
-        })
+
         recyclerView = rootView.findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(activity!!.applicationContext)
+        recyclerView.layoutManager = layoutManager
+        addScrollListener()
+
         recyclerView.setNestedScrollingEnabled(false)
         recyclerView.setHasFixedSize(true)
-        adapter = RecyclerAdapter()
-        adapter.setColorArray(colorArray)
-        adapter.setClickListener(clickListener)
-        recyclerView.setAdapter(adapter)
+        loadFirstData()
+
+
 
         return rootView
     }
 
-    fun setListenerEditText(){
-        etSearch.addTextChangedListener(object :TextWatcher{
-            override fun afterTextChanged(s: Editable?) {
-                MyPositionalDataSource.setFilter(s.toString())
-                Log.e("Init",s.toString())
-                factory.dataSource.filter = s.toString()
-                factory.dataSource.invalidate()
+
+
+
+
+    fun addScrollListener(){
+
+        recyclerView.addOnScrollListener(object :PaginationScrollListener(layoutManager){
+            override fun isLastPage(): Boolean {
+                return isLastPage
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+            override fun isLoading(): Boolean {
+                return isLoading
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
+            override fun loadMoreItems() {
+                isLoading = true
+                loadData()
             }
 
         })
     }
+
+
+
+    fun loadFirstData() {
+
+        NetworkService.getInstance()
+            .getJSONApi()
+            .getCards(page.toString(), "")
+            .enqueue(object : Callback<InfoPageAndResult> {
+                override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
+                }
+
+                override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
+                    if (response.isSuccessful) {
+                        val infoPageAndResult: InfoPageAndResult = response.body()!!
+                        cardsList = ArrayList(infoPageAndResult.results)
+
+                        adapter = RecyclerAdapter(cardsList!!)
+                        adapter.setColorArray(colorArray)
+                        adapter.setClickListener(clickListener)
+                        recyclerView.setAdapter(adapter)
+                    }
+                }
+            })
+        page++
+
+
+    }
+
+
+
+
+
+    fun loadData() {
+        NetworkService.getInstance()
+            .getJSONApi()
+            .getCards(page.toString(), "")
+            .enqueue(object : Callback<InfoPageAndResult> {
+                override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
+                }
+
+                override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
+                    if (response.isSuccessful) {
+                        Log.e("Req", call.request().toString())
+                        val infoPageAndResult: InfoPageAndResult = response.body()!!
+                        cardsList = ArrayList(infoPageAndResult.results)
+                        adapter.addData(cardsList!!)
+                        isLoading = false
+                    }
+                }
+            })
+        page++
+    }
+
+
+    fun loadDataWithFilter(filter: String) {
+
+        NetworkService.getInstance()
+            .getJSONApi()
+            .getCards("", filter)
+            .enqueue(object : Callback<InfoPageAndResult> {
+                override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
+                }
+
+                override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
+                    if (response.isSuccessful) {
+                        Log.e("Req", call.request().toString())
+                        val infoPageAndResult: InfoPageAndResult = response.body()!!
+                        cardsList = ArrayList(infoPageAndResult.results)
+
+
+                    }
+                }
+            })
+        page = 1
+
+    }
+
+
 
 
 }

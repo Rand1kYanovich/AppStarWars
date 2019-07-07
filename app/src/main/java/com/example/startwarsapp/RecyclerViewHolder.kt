@@ -4,6 +4,7 @@ import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import com.example.startwarsapp.model.entity.FullInfoCard
 
 class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -15,8 +16,8 @@ class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     }
 
-    fun bind(position:Int,listener:OnItemClickListener){
-        itemView.setOnClickListener { v -> listener.onClick(v!!,position) }
+    fun bind(position:Int,listener:OnItemClickListener,cardsList:ArrayList<FullInfoCard>){
+        itemView.setOnClickListener { v -> listener.onClick(v!!,position,cardsList) }
     }
 
 }

@@ -47,7 +47,7 @@ class RecyclerAdapter constructor(private val cardsList:ArrayList<FullInfoCard>)
         if(i >= colorArray.size)i=0
         holder.tvName!!.setText(item.name)
         holder.clCard!!.setBackgroundColor(Color.parseColor(colorArray[i]))
-        holder.bind(position,listener)
+        holder.bind(position,listener,cardsList)
         item.color = colorArray[i]
 
 

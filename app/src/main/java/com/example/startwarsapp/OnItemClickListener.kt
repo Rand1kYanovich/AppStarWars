@@ -2,10 +2,9 @@ package com.example.startwarsapp
 
 import android.os.Bundle
 import android.view.View
+import com.example.startwarsapp.model.entity.FullInfoCard
 
 interface OnItemClickListener {
-
-
-        public fun onClick(view: View, position: Int){}
+        fun onClick(view: View, position: Int,cardsList:ArrayList<FullInfoCard>){}
 
 }

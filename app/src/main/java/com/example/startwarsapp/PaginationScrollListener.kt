@@ -28,7 +28,7 @@ abstract class PaginationScrollListener
 
 
         if (!isLoading() && !isLastPage()) {
-            if (visibleItemCount + firstVisibleItemPosition >= totalItemCount-1 && firstVisibleItemPosition >= 0) {
+            if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
                 loadMoreItems()
 
             }

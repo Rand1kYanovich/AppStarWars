@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.startwarsapp.model.entity.FullInfoCard
+import java.io.Serializable
 
 class FullCardFragment: Fragment() {
 

@@ -30,29 +30,29 @@ class AllCardsFragment: Fragment() {
     lateinit var adapter: RecyclerAdapter
     lateinit var etSearch:EditText
 
-    val clickListener: OnItemClickListener
+    lateinit var clickListener: OnItemClickListener
     lateinit var colorArray: Array<String>
-    var layoutManager = LinearLayoutManager(context)
+    lateinit var layoutManager:LinearLayoutManager
+
     var isLastPage: Boolean = false
     var isLoading: Boolean = false
     var page:Int = 1
     var filter:String = ""
 
-    var cardsList: ArrayList<FullInfoCard>?=null
+    lateinit var cardsList: ArrayList<FullInfoCard>
 
-
-
-    init {
-        clickListener = object : OnItemClickListener {
-            override fun onClick(view: View, position: Int) {
-                val fullCardFragment: FullCardFragment = FullCardFragment()
-                val bundle: Bundle = Bundle()
-                bundle.putSerializable(getString(R.string.bundle_argument_name), cardsList!!.get(position))
-                fullCardFragment.arguments = bundle
-                FragmentUtil.replaceWithBackStack(activity!!.supportFragmentManager, R.id.container, fullCardFragment)
-            }
+init {
+    clickListener = object : OnItemClickListener {
+        override fun onClick(view: View, position: Int, cardsList: ArrayList<FullInfoCard>) {
+            val fullCardFragment: FullCardFragment = FullCardFragment()
+            val bundle: Bundle = Bundle()
+            bundle.putSerializable(getString(R.string.bundle_argument_name), cardsList.get(position))
+            fullCardFragment.arguments = bundle
+            FragmentUtil.replaceWithBackStack(activity!!.supportFragmentManager, R.id.container, fullCardFragment)
         }
     }
+}
+
 
 
 
@@ -60,11 +60,12 @@ class AllCardsFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView:View = inflater.inflate(R.layout.fragment_all_cards,container,false)
 
-
+        page = 1
         etSearch = rootView.findViewById(R.id.etSearch)
         colorArray = resources.getStringArray(R.array.card_color)
 
         recyclerView = rootView.findViewById(R.id.recyclerView)
+        layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
         addScrollListener()
 
@@ -95,6 +96,7 @@ class AllCardsFragment: Fragment() {
             override fun loadMoreItems() {
                 isLoading = true
                 loadData()
+
             }
 
         })
@@ -116,7 +118,7 @@ class AllCardsFragment: Fragment() {
                         val infoPageAndResult: InfoPageAndResult = response.body()!!
                         cardsList = ArrayList(infoPageAndResult.results)
 
-                        adapter = RecyclerAdapter(cardsList!!)
+                        adapter = RecyclerAdapter(cardsList)
                         adapter.setColorArray(colorArray)
                         adapter.setClickListener(clickListener)
                         recyclerView.setAdapter(adapter)
@@ -145,7 +147,7 @@ class AllCardsFragment: Fragment() {
                         Log.e("Req", call.request().toString())
                         val infoPageAndResult: InfoPageAndResult = response.body()!!
                         cardsList = ArrayList(infoPageAndResult.results)
-                        adapter.addData(cardsList!!)
+                        adapter.addData(cardsList)
                         isLoading = false
                     }
                 }

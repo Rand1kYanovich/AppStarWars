@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import android.widget.ImageButton
 import com.example.startwarsapp.model.api.NetworkService
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
-import com.example.startwarsapp.util.CardUtil
 import com.example.startwarsapp.util.FragmentUtil
 import com.example.startwarsapp.util.PaginationScrollListener
 import retrofit2.Call
@@ -23,51 +21,60 @@ import retrofit2.Response
 class AllCardsFragment: Fragment() {
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: RecyclerAdapter
-    lateinit var etSearch:EditText
-
-    var clickListener: OnItemClickListener
-    //var favoriteListener:OnFavoriteClick
-    lateinit var colorArray: Array<String>
     lateinit var layoutManager:LinearLayoutManager
+
+    lateinit var etSearch:EditText
     lateinit var btnSearch:ImageButton
-
-
-    var isLastPage: Boolean = false
-    var isLoading: Boolean = false
     var filter:String = ""
 
+    var clickListener: OnItemClickListener
+    var favoriteListener:OnFavoriteClickListener
+
+    lateinit var colorArray: Array<String>
+    var cardsList = ArrayList<FullInfoCard>()
+    var filterList = ArrayList<FullInfoCard>()
+
+    var page:Int = 1
+    var isLastPage: Boolean = false
+    var isLoading: Boolean = false
 
 
 
-init {
-    clickListener = object : OnItemClickListener {
-        override fun onClick(view: View, position: Int, cardsList: ArrayList<FullInfoCard>) {
-            val fullCardFragment = FullCardFragment()
-            val bundle = Bundle()
-            bundle.putSerializable(getString(R.string.bundle_argument_name), cardsList.get(position))
-            fullCardFragment.arguments = bundle
-            FragmentUtil.replaceWithBackStack(activity!!.supportFragmentManager, R.id.container, fullCardFragment)
+    init {
+        clickListener = object : OnItemClickListener {
+            override fun onClick(view: View, position: Int, cardsList: ArrayList<FullInfoCard>) {
+                FragmentUtil.replaceWithBackStack(
+                    activity!!.supportFragmentManager,
+                    R.id.container,
+                    FullCardFragment.newInstance(getString(R.string.bundle_argument_name), cardsList.get(position))
+                )
+            }
+        }
+
+
+        favoriteListener = object :OnFavoriteClickListener{
+            override fun onFavoriteClickListener(position:Int,favoriteList:ArrayList<FullInfoCard>,btnFavorite:ImageButton) {
+                if(cardsList.get(position).isFavorites) {
+                    cardsList.get(position).isFavorites = false
+                    removeFavoriteCard(cardsList.get(position))
+                    btnFavorite.setImageResource(R.drawable.ic_favorite_false)
+                } else if(!cardsList.get(position).isFavorites) {
+                    cardsList.get(position).isFavorites = true
+                    addFavoriteCard(cardsList.get(position))
+                    btnFavorite.setImageResource(R.drawable.ic_favorite_true)
+                }
+            }
         }
     }
-//
-//    favoriteListener = object :OnFavoriteClick{
-//        override fun onFavoriteClick(btnFavorite:ImageButton, isFavorite: Boolean,position:Int) {
-//            if(isFavorite) {
-//                btnFavorite.setImageResource(R.drawable.ic_favorite_true)
-//                favoriteList = CardUtil.addFavoriteCard()
-//            } else if(!isFavorite){
-//
-//            }
-//        }
-//
-//    }
-//    favoriteList = ArrayList()
-}
 
+    companion object{
+        var favoriteList = ArrayList<FullInfoCard>()
+        fun newInstance():AllCardsFragment{
+            val fragment = AllCardsFragment()
+            return fragment
+        }
 
-
-
-
+    }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -75,7 +82,7 @@ init {
             etSearch = rootView.findViewById(R.id.etSearch)
             btnSearch = rootView.findViewById(R.id.btnSearch)
             addSearchListener()
-            colorArray = resources.getStringArray(R.array.card_color)
+            colorArray  = resources.getStringArray(R.array.card_color)
 
             recyclerView = rootView.findViewById(R.id.recyclerView)
             layoutManager = LinearLayoutManager(context)
@@ -91,8 +98,6 @@ init {
     }
 
 
-
-
     fun addSearchListener(){
         btnSearch.setOnClickListener {
             if(!etSearch.text.toString().equals("")) {
@@ -100,7 +105,7 @@ init {
                 filter = etSearch.text.toString()
             }else{
                 filter = ""
-                adapter.setList(CardUtil.cardsList)
+                adapter.setList(cardsList)
                 isLastPage = false
                 isLoading = false
 
@@ -111,106 +116,96 @@ init {
 
 
     fun loadFirstData() {
-        if(CardUtil.page == 1) {
+        if(page == 1) {
             NetworkService.getInstance()
                 .getJSONApi()
-                .getCards(CardUtil.page.toString(), "")
+                .getCards(page.toString(), "")
                 .enqueue(object : Callback<InfoPageAndResult> {
-                    override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
-                    }
+                    override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {}
 
                     override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
                         if (response.isSuccessful) {
                             val infoPageAndResult: InfoPageAndResult = response.body()!!
-                            CardUtil.addCard(ArrayList(infoPageAndResult.results))
-                            adapter = RecyclerAdapter(CardUtil.cardsList, activity!!.applicationContext)
-                            adapter.setColorArray(colorArray)
-                            adapter.setClickListener(clickListener)
-                            recyclerView.setAdapter(adapter)
-                            CardUtil.page++
-
-
+                            addCard(ArrayList(infoPageAndResult.results))
+                            setAdapter()
+                            page++
                         }
                     }
                 })
-        }else{
-            adapter = RecyclerAdapter(CardUtil.cardsList, activity!!.applicationContext)
-            adapter.setColorArray(colorArray)
-            adapter.setClickListener(clickListener)
-            recyclerView.setAdapter(adapter)
-
-        }
-
-
-
-
-
-
+        }else setAdapter()
     }
 
 
-
     fun loadData(filter: String,pageNumber:String) {
-
         NetworkService.getInstance()
             .getJSONApi()
             .getCards(pageNumber, filter)
             .enqueue(object : Callback<InfoPageAndResult> {
-                override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {
-                }
+
+                override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {}
 
                 override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
                     if (response.isSuccessful) {
                         val infoPageAndResult: InfoPageAndResult = response.body()!!
-
                         isLoading = false
                         if(filter.equals("")) {
-                            CardUtil.addCard(ArrayList(infoPageAndResult.results))
-                            adapter.setList(CardUtil.cardsList)
-                            CardUtil.page++
+                            addCard(ArrayList(infoPageAndResult.results))
+                            adapter.setList(cardsList)
+                            page++
                         }
                         else{
-                            CardUtil.addFilterList(ArrayList(infoPageAndResult.results))
-                            adapter.setList(CardUtil.filterList)
+                            addFilterList(ArrayList(infoPageAndResult.results))
+                            adapter.setList(filterList)
                         }
-
-
                     }
                 }
             })
-
-
-
     }
 
 
-
     fun addScrollListener(){
-
         recyclerView.addOnScrollListener(object : PaginationScrollListener(layoutManager){
-            override fun isLastPage(): Boolean {
-                return isLastPage
-            }
+            override fun isLastPage() = isLastPage
 
-            override fun isLoading(): Boolean {
-                return isLoading
-            }
+            override fun isLoading() = isLoading
 
             override fun loadMoreItems() {
                 isLoading = true
                 if(filter == "") {
-                    loadData("",CardUtil.page.toString())
+                    loadData("",page.toString())
                     isLoading = true
                 }
                 else isLoading = false
-
             }
-
         })
     }
 
 
+    fun addFavoriteCard(favoriteCard: FullInfoCard){ favoriteList.add(favoriteCard) }
 
+
+    fun removeFavoriteCard(item:FullInfoCard){
+        favoriteList.remove(item)
+        adapter.notifyItemRangeChanged(favoriteList.size +1, favoriteList.size)
+    }
+
+
+    fun addCard(cardList:ArrayList<FullInfoCard>){ this.cardsList.addAll(cardList)}
+
+
+    fun addFilterList(filterList:ArrayList<FullInfoCard>){
+        this.filterList.removeAll(this.filterList)
+        this.filterList.addAll(filterList)
+    }
+
+
+    fun setAdapter(){
+        adapter = RecyclerAdapter(cardsList, activity!!.applicationContext)
+        adapter.setColorArray(colorArray)
+        adapter.setClickListener(clickListener)
+        adapter.setFavoriteListener(favoriteListener)
+        recyclerView.setAdapter(adapter)
+    }
 
 
 }

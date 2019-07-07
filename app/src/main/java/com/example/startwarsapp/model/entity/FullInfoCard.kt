@@ -14,17 +14,7 @@ class FullInfoCard :Serializable{
     var birth_year: String = ""
     var gender:String = ""
     var color:String = ""
-    var favorites:Boolean = false
-    var searcheable:String = ""
+    var isFavorites:Boolean = false
 
-
-    companion object{
-        val diffCalback = object :DiffUtil.ItemCallback<FullInfoCard>(){
-            override fun areItemsTheSame(p0: FullInfoCard, p1: FullInfoCard): Boolean = p0.equals(p1)
-
-            override fun areContentsTheSame(p0: FullInfoCard, p1: FullInfoCard): Boolean =p0.equals(p1)
-
-        }
-    }
 
 }

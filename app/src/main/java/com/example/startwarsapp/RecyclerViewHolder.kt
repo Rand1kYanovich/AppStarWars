@@ -19,12 +19,18 @@ class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     }
 
-    fun bind(position:Int,listener:OnItemClickListener,cardsList:ArrayList<FullInfoCard>){
-        itemView.setOnClickListener { v -> listener.onClick(v!!,position,cardsList) }
+    fun bind(
+        position: Int,
+        clickListener: OnItemClickListener,
+        cardsList: ArrayList<FullInfoCard>,
+        favoriteClickListener: OnFavoriteClickListener,
+        btnFavorite: ImageButton
+    ){
+        itemView.setOnClickListener { v -> clickListener.onClick(v!!,position,cardsList) }
 
-        btnFavorite!!.setOnClickListener({
-
-        })
+        this.btnFavorite!!.setOnClickListener {
+            favoriteClickListener.onFavoriteClickListener(position,cardsList, btnFavorite)
+        }
     }
 
 }

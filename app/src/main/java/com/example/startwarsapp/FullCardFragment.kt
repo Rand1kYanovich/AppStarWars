@@ -59,4 +59,15 @@ class FullCardFragment: Fragment() {
 
         return rootView
     }
+
+    companion object{
+
+        fun newInstance(key:String,card:FullInfoCard):FullCardFragment{
+            val fullCardFragment = FullCardFragment()
+            val bundle = Bundle()
+            bundle.putSerializable(key, card)
+            fullCardFragment.arguments = bundle
+            return fullCardFragment
+        }
+    }
 }

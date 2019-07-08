@@ -2,6 +2,8 @@ package com.example.startwarsapp
 
 
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity() {
         actionBar!!.setDisplayHomeAsUpEnabled(true)
         actionBar.setDisplayShowHomeEnabled(true)
 
+        actionBar.setBackgroundDrawable(ColorDrawable(Color.BLACK))
+
 
     }
 
@@ -46,7 +50,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item!!.itemId) {
         R.id.action_favorite-> {
-            Log.e("Hi","Girls")
             FragmentUtil.replaceWithBackStack(supportFragmentManager,R.id.container,FavoriteCardsFragment.newInstance())
             true
         }

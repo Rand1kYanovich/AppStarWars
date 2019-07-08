@@ -49,39 +49,33 @@ class FullCardFragment: Fragment() {
         btnFavorite.setBackgroundColor(Color.parseColor(fullCardObject!!.color))
 
         btnFavorite.setOnClickListener {
-            if(favoriteDao.getById(fullCardObject!!.name) != null) {
-                favoriteDao.delete(fullCardObject!!)
-                btnFavorite.setImageResource(R.drawable.ic_favorite_false)
-            }
-            else if(favoriteDao.getById(fullCardObject!!.name) == null){
-                favoriteDao.insert(fullCardObject!!)
-                btnFavorite.setImageResource(R.drawable.ic_favorite_true)
-            }
+            if(favoriteDao.getById(fullCardObject!!.name) != null) favoriteDao.delete(fullCardObject!!)
+                else if(favoriteDao.getById(fullCardObject!!.name) == null) favoriteDao.insert(fullCardObject!!)
         }
 
         tvName = rootView.findViewById(R.id.tvName)
-        tvName.setText("Имя: "+fullCardObject!!.name)
+        tvName.text = "Имя: "+fullCardObject!!.name
 
         tvHeight = rootView.findViewById(R.id.tvHeight)
-        tvHeight.setText("Рост: "+fullCardObject!!.height)
+        tvHeight.text = "Рост: "+fullCardObject!!.height
 
         tvMass = rootView.findViewById(R.id.tvMass)
-        tvMass.setText("Вес: "+fullCardObject!!.mass)
+        tvMass.text = "Вес: "+fullCardObject!!.mass
 
         tvHairColor = rootView.findViewById(R.id.tvHairColor)
-        tvHairColor.setText("Цвет волос: "+fullCardObject!!.hair_color)
+        tvHairColor.text = "Цвет волос: "+fullCardObject!!.hair_color
 
         tvSkinColor = rootView.findViewById(R.id.tvSkinColor)
-        tvSkinColor.setText("Цвет кожи: "+fullCardObject!!.skin_color)
+        tvSkinColor.text = "Цвет кожи: "+fullCardObject!!.skin_color
 
         tvEyeColor = rootView.findViewById(R.id.tvEyeColor)
-        tvEyeColor.setText("Цвет глаз: "+fullCardObject!!.eye_color)
+        tvEyeColor.text = "Цвет глаз: "+fullCardObject!!.eye_color
 
         tvBirthYear = rootView.findViewById(R.id.tvBirthYear)
-        tvBirthYear.setText("День рождения: "+fullCardObject!!.birth_year)
+        tvBirthYear.text = "День рождения: "+fullCardObject!!.birth_year
 
         tvGender = rootView.findViewById(R.id.tvGender)
-        tvGender.setText("Пол: "+fullCardObject!!.gender)
+        tvGender.text = "Пол: "+fullCardObject!!.gender
 
         return rootView
     }

@@ -27,7 +27,7 @@ class AllCardsFragment: Fragment() {
 
     lateinit var etSearch:EditText
     lateinit var btnSearch:ImageButton
-    var filter:String = ""
+    var isFilter = false
 
     var clickListener: OnItemClickListener
     var favoriteListener:OnFavoriteClickListener
@@ -37,7 +37,6 @@ class AllCardsFragment: Fragment() {
     var filterList = ArrayList<FullInfoCard>()
 
     var page:Int = 1
-    var isLastPage: Boolean = false
     var isLoading: Boolean = false
 
     var db: AppDatabase
@@ -64,23 +63,10 @@ class AllCardsFragment: Fragment() {
 
         favoriteListener = object :OnFavoriteClickListener{
             override fun onFavoriteClickListener(position:Int,favoriteList:ArrayList<FullInfoCard>,btnFavorite:ImageButton) {
-                if(favoriteDao.getById(cardsList.get(position).name) != null) {
-                    favoriteDao.delete(cardsList.get(position))
-                    btnFavorite.setImageResource(R.drawable.ic_favorite_false)
-                }
-                    else if(favoriteDao.getById(cardsList.get(position).name) == null){
-                        favoriteDao.insert(cardsList.get(position))
-                        btnFavorite.setImageResource(R.drawable.ic_favorite_true)
-                    }
-
-
+                if(favoriteDao.getById(cardsList.get(position).name) != null) favoriteDao.delete(cardsList.get(position))
+                    else if(favoriteDao.getById(cardsList.get(position).name) == null) favoriteDao.insert(cardsList.get(position))
             }
         }
-    }
-
-    companion object{
-        var favoriteList = ArrayList<FullInfoCard>()
-
     }
 
 
@@ -110,20 +96,15 @@ class AllCardsFragment: Fragment() {
         btnSearch.setOnClickListener {
             if(!etSearch.text.toString().equals("")) {
                 loadData(etSearch.text.toString(),"")
-                filter = etSearch.text.toString()
+                isFilter = true
             }else{
-                filter = ""
+                isFilter = false
                 adapter.setList(cardsList)
-                isLastPage = false
                 isLoading = false
 
             }
-
         }
     }
-
-
-
 
 
     fun loadData(filter: String,pageNumber:String) {
@@ -131,14 +112,13 @@ class AllCardsFragment: Fragment() {
             .getJSONApi()
             .getCards(pageNumber, filter)
             .enqueue(object : Callback<InfoPageAndResult> {
-
                 override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {}
 
                 override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
                     if (response.isSuccessful) {
                         val infoPageAndResult: InfoPageAndResult = response.body()!!
                         isLoading = false
-                        if(filter.equals("")) {
+                        if(!isFilter) {
                             addCard(ArrayList(infoPageAndResult.results))
                             adapter.setList(cardsList)
                             page++
@@ -155,13 +135,12 @@ class AllCardsFragment: Fragment() {
 
     fun addScrollListener(){
         recyclerView.addOnScrollListener(object : PaginationScrollListener(layoutManager){
-            override fun isLastPage() = isLastPage
 
             override fun isLoading() = isLoading
 
             override fun loadMoreItems() {
                 isLoading = true
-                if(filter == "") {
+                if(!isFilter) {
                     loadData("",page.toString())
                     isLoading = true
                 }
@@ -171,13 +150,6 @@ class AllCardsFragment: Fragment() {
     }
 
 
-    fun addFavoriteCard(favoriteCard: FullInfoCard){ favoriteList.add(favoriteCard) }
-
-
-    fun removeFavoriteCard(item:FullInfoCard){
-        favoriteList.remove(item)
-        adapter.notifyItemRangeChanged(favoriteList.size +1, favoriteList.size)
-    }
 
 
     fun addCard(cardList:ArrayList<FullInfoCard>){ this.cardsList.addAll(cardList)}

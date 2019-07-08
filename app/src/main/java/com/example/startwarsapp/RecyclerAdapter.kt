@@ -2,15 +2,11 @@ package com.example.startwarsapp
 
 import android.content.Context
 import android.graphics.Color
-import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import com.example.startwarsapp.model.entity.FullInfoCard
-import com.example.startwarsapp.util.ViewUtil
 
 
 class RecyclerAdapter constructor(private var cardsList:ArrayList<FullInfoCard>, private val context:Context) :
@@ -35,8 +31,6 @@ class RecyclerAdapter constructor(private var cardsList:ArrayList<FullInfoCard>,
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
         val item:FullInfoCard = cardsList.get(position)
         holder.tvName!!.setText(item.name)
-        if(item.isFavorites)holder.btnFavorite!!.setImageResource(R.drawable.ic_favorite_true)
-        else if(!item.isFavorites)holder.btnFavorite!!.setImageResource(R.drawable.ic_favorite_false)
 
         if(item.color.equals("")) {
             if(i >= colorArray.size)i=0
@@ -49,8 +43,6 @@ class RecyclerAdapter constructor(private var cardsList:ArrayList<FullInfoCard>,
             holder.clCard!!.setBackgroundColor(Color.parseColor(item.color))
             holder.btnFavorite!!.setBackgroundColor(Color.parseColor(item.color))
         }
-
-
         holder.bind(position,listener,cardsList,favoriteListener, holder.btnFavorite!!)
     }
 

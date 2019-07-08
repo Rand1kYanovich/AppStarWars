@@ -24,9 +24,6 @@ class App : Application() {
     }
 
 
-
-
-
     fun getDB():AppDatabase{
         return getInstance().database
     }

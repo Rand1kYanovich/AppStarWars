@@ -20,9 +20,5 @@ class FragmentUtil {
                 .commit()
 
         }
-
-
-
-
     }
 }

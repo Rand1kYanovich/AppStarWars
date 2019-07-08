@@ -2,20 +2,12 @@ package com.example.startwarsapp.util
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 
-/**
- * Pagination class to add more items to the list when reach the last item.
- */
+
+
 abstract class PaginationScrollListener
-/**
- * Supporting only LinearLayoutManager for now.
- *
- * @param layoutManager
- */
-    (var layoutManager: LinearLayoutManager) : RecyclerView.OnScrollListener() {
 
-    abstract fun isLastPage(): Boolean
+    (var layoutManager: LinearLayoutManager) : RecyclerView.OnScrollListener() {
 
     abstract fun isLoading(): Boolean
 
@@ -27,7 +19,7 @@ abstract class PaginationScrollListener
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
 
-        if (!isLoading() && !isLastPage()) {
+        if (!isLoading()) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
                 loadMoreItems()
 

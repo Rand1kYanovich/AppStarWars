@@ -27,7 +27,6 @@ class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         btnFavorite: ImageButton
     ){
         itemView.setOnClickListener { v -> clickListener.onClick(v!!,position,cardsList) }
-
         this.btnFavorite!!.setOnClickListener {
             favoriteClickListener.onFavoriteClickListener(position,cardsList, btnFavorite)
         }

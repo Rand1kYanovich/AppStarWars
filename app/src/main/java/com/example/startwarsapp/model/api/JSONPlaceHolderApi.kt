@@ -8,7 +8,7 @@ import retrofit2.http.Query
 
 interface JSONPlaceHolderApi {
 
-@GET(".")
-public fun getCards(@Query("page") page:String,@Query("search") search:String): Call<InfoPageAndResult>
+    @GET(".")
+    fun getCards(@Query("page") page:String, @Query("search") search:String): Call<InfoPageAndResult>
 
 }

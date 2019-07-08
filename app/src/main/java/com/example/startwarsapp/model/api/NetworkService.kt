@@ -12,15 +12,15 @@ class NetworkService {
         private var mInstance :NetworkService?= null
         private val BASE_URL:String = "https://swapi.co/api/people/"
 
-        public fun getInstance():NetworkService {
+        fun getInstance():NetworkService {
             if(mInstance==null) mInstance = NetworkService()
             return mInstance!!
         }
 
-        public fun getOkHttpClient():OkHttpClient{
-            var logging = HttpLoggingInterceptor()
-            logging.setLevel(HttpLoggingInterceptor.Level.NONE)
-            var okClient:OkHttpClient = OkHttpClient.Builder()
+        fun getOkHttpClient():OkHttpClient{
+            val logging = HttpLoggingInterceptor()
+            logging.level = HttpLoggingInterceptor.Level.NONE
+            val okClient:OkHttpClient = OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .build()
             return okClient
@@ -37,7 +37,7 @@ class NetworkService {
             .build()
     }
 
-    public fun getJSONApi():JSONPlaceHolderApi{
+    fun getJSONApi():JSONPlaceHolderApi{
         return mRetrofit!!.create(JSONPlaceHolderApi::class.java)
     }
 

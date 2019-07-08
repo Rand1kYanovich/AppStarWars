@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import com.example.startwarsapp.model.database.AppDatabase
+import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.util.FragmentUtil
 
@@ -17,9 +19,22 @@ class FavoriteCardsFragment: Fragment() {
     lateinit var adapter:RecyclerAdapter
     lateinit var layoutManager: LinearLayoutManager
 
+    var favoriteList:ArrayList<FullInfoCard>
+    var db:AppDatabase
+    var favoriteDao:FavoriteDao
+
+    init {
+        db = App.getInstance().getDB()
+        favoriteDao = db.favoriteDao()
+        favoriteList = ArrayList()
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView:View = inflater.inflate(R.layout.fragment_favorite_cards,container,false)
+
+
+        favoriteList = ArrayList(favoriteDao.getAll())
         recyclerView = rootView.findViewById(R.id.recyclerView)
         layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
@@ -27,7 +42,7 @@ class FavoriteCardsFragment: Fragment() {
         recyclerView.setNestedScrollingEnabled(false)
         recyclerView.setHasFixedSize(true)
 
-        adapter = RecyclerAdapter(AllCardsFragment.favoriteList,context!!)
+        adapter = RecyclerAdapter(favoriteList,context!!)
         adapter.setColorArray(resources.getStringArray(R.array.card_color))
         adapter.setClickListener(object: OnItemClickListener{
             override fun onClick(view: View, position: Int, cardsList: ArrayList<FullInfoCard>) {

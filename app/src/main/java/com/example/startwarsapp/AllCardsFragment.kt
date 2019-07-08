@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import com.example.startwarsapp.model.api.NetworkService
+import com.example.startwarsapp.model.database.AppDatabase
+import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
 import com.example.startwarsapp.util.FragmentUtil
@@ -38,9 +40,17 @@ class AllCardsFragment: Fragment() {
     var isLastPage: Boolean = false
     var isLoading: Boolean = false
 
+    var db: AppDatabase
+    var favoriteDao: FavoriteDao
+
+
 
 
     init {
+
+        db = App.getInstance().database
+        favoriteDao = db.favoriteDao()
+
         clickListener = object : OnItemClickListener {
             override fun onClick(view: View, position: Int, cardsList: ArrayList<FullInfoCard>) {
                 FragmentUtil.replaceWithBackStack(
@@ -54,15 +64,16 @@ class AllCardsFragment: Fragment() {
 
         favoriteListener = object :OnFavoriteClickListener{
             override fun onFavoriteClickListener(position:Int,favoriteList:ArrayList<FullInfoCard>,btnFavorite:ImageButton) {
-                if(cardsList.get(position).isFavorites) {
-                    cardsList.get(position).isFavorites = false
-                    removeFavoriteCard(cardsList.get(position))
+                if(favoriteDao.getById(cardsList.get(position).name) != null) {
+                    favoriteDao.delete(cardsList.get(position))
                     btnFavorite.setImageResource(R.drawable.ic_favorite_false)
-                } else if(!cardsList.get(position).isFavorites) {
-                    cardsList.get(position).isFavorites = true
-                    addFavoriteCard(cardsList.get(position))
-                    btnFavorite.setImageResource(R.drawable.ic_favorite_true)
                 }
+                    else if(favoriteDao.getById(cardsList.get(position).name) == null){
+                        favoriteDao.insert(cardsList.get(position))
+                        btnFavorite.setImageResource(R.drawable.ic_favorite_true)
+                    }
+
+
             }
         }
     }
@@ -75,20 +86,20 @@ class AllCardsFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView:View = inflater.inflate(R.layout.fragment_all_cards,container,false)
-            etSearch = rootView.findViewById(R.id.etSearch)
-            btnSearch = rootView.findViewById(R.id.btnSearch)
-            addSearchListener()
-            colorArray  = resources.getStringArray(R.array.card_color)
+        etSearch = rootView.findViewById(R.id.etSearch)
+        btnSearch = rootView.findViewById(R.id.btnSearch)
+        addSearchListener()
+        colorArray  = resources.getStringArray(R.array.card_color)
 
-            recyclerView = rootView.findViewById(R.id.recyclerView)
-            layoutManager = LinearLayoutManager(context)
-            recyclerView.layoutManager = layoutManager
-            addScrollListener()
+        recyclerView = rootView.findViewById(R.id.recyclerView)
+        layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = layoutManager
+        addScrollListener()
 
-            recyclerView.setNestedScrollingEnabled(false)
-            recyclerView.setHasFixedSize(true)
-            setAdapter()
-            if(page ==1) loadData("","1")
+        recyclerView.setNestedScrollingEnabled(false)
+        recyclerView.setHasFixedSize(true)
+        setAdapter()
+        if(page ==1) loadData("","1")
 
 
         return rootView

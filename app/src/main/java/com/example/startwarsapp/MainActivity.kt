@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.util.FragmentUtil
 
 
@@ -17,7 +19,6 @@ import com.example.startwarsapp.util.FragmentUtil
 
 
 class MainActivity : AppCompatActivity() {
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -7,7 +7,10 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
+import com.example.startwarsapp.model.database.AppDatabase
+import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
 import java.io.Serializable
 
@@ -15,6 +18,7 @@ class FullCardFragment: Fragment() {
 
     var fullCardObject:FullInfoCard?=null
     lateinit var clCard:ConstraintLayout
+    lateinit var btnFavorite:ImageButton
     lateinit var tvName:TextView
     lateinit var tvHeight:TextView
     lateinit var tvMass:TextView
@@ -24,6 +28,14 @@ class FullCardFragment: Fragment() {
     lateinit var tvBirthYear:TextView
     lateinit var tvGender:TextView
 
+    var db:AppDatabase
+    var favoriteDao:FavoriteDao
+
+    init {
+        db = App.getInstance().getDB()
+        favoriteDao = db.favoriteDao()
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView:View = inflater.inflate(R.layout.fragment_full_card,container,false)
@@ -32,6 +44,20 @@ class FullCardFragment: Fragment() {
 
         clCard = rootView.findViewById(R.id.clCard)
         clCard.setBackgroundColor(Color.parseColor(fullCardObject!!.color))
+
+        btnFavorite = rootView.findViewById(R.id.btnFavorite)
+        btnFavorite.setBackgroundColor(Color.parseColor(fullCardObject!!.color))
+
+        btnFavorite.setOnClickListener {
+            if(favoriteDao.getById(fullCardObject!!.name) != null) {
+                favoriteDao.delete(fullCardObject!!)
+                btnFavorite.setImageResource(R.drawable.ic_favorite_false)
+            }
+            else if(favoriteDao.getById(fullCardObject!!.name) == null){
+                favoriteDao.insert(fullCardObject!!)
+                btnFavorite.setImageResource(R.drawable.ic_favorite_true)
+            }
+        }
 
         tvName = rootView.findViewById(R.id.tvName)
         tvName.setText("Имя: "+fullCardObject!!.name)

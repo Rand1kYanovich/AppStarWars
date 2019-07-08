@@ -49,6 +49,8 @@ class RecyclerAdapter constructor(private var cardsList:ArrayList<FullInfoCard>,
             holder.clCard!!.setBackgroundColor(Color.parseColor(item.color))
             holder.btnFavorite!!.setBackgroundColor(Color.parseColor(item.color))
         }
+
+
         holder.bind(position,listener,cardsList,favoriteListener, holder.btnFavorite!!)
     }
 

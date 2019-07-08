@@ -69,10 +69,6 @@ class AllCardsFragment: Fragment() {
 
     companion object{
         var favoriteList = ArrayList<FullInfoCard>()
-        fun newInstance():AllCardsFragment{
-            val fragment = AllCardsFragment()
-            return fragment
-        }
 
     }
 
@@ -91,7 +87,8 @@ class AllCardsFragment: Fragment() {
 
             recyclerView.setNestedScrollingEnabled(false)
             recyclerView.setHasFixedSize(true)
-            loadFirstData()
+            setAdapter()
+            if(page ==1) loadData("","1")
 
 
         return rootView
@@ -115,25 +112,7 @@ class AllCardsFragment: Fragment() {
     }
 
 
-    fun loadFirstData() {
-        if(page == 1) {
-            NetworkService.getInstance()
-                .getJSONApi()
-                .getCards(page.toString(), "")
-                .enqueue(object : Callback<InfoPageAndResult> {
-                    override fun onFailure(call: Call<InfoPageAndResult>, t: Throwable) {}
 
-                    override fun onResponse(call: Call<InfoPageAndResult>, response: Response<InfoPageAndResult>) {
-                        if (response.isSuccessful) {
-                            val infoPageAndResult: InfoPageAndResult = response.body()!!
-                            addCard(ArrayList(infoPageAndResult.results))
-                            setAdapter()
-                            page++
-                        }
-                    }
-                })
-        }else setAdapter()
-    }
 
 
     fun loadData(filter: String,pageNumber:String) {

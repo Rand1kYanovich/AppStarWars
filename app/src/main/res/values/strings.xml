@@ -2,4 +2,6 @@
     <string name="app_name">StartWarsApp</string>
     <string name="bundle_argument_name">fullInfo</string>
     <string name="imageButtonDescription">add Favorite Cards</string>
+    <string name="etSearch_hint">Введите название</string>
+    <string name="search_button_description">Search button</string>
 </resources>

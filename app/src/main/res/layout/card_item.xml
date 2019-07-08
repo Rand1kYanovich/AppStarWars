@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/clCard"
-        android:background="@drawable/card_background"
+<RelativeLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/clMain"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_gravity="center"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
+        android:layout_gravity="bottom"
         xmlns:tools="http://schemas.android.com/tools">
 
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/clCard"
+            android:layout_width="200dp"
+            android:layout_height="300dp"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="10dp"
 
-    <TextView
-            android:id="@+id/tvName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Luke Skywalker"
-            android:gravity="center"
-            android:textColor="@color/textColor"
-            android:textSize="20sp"
-            android:layout_marginTop="50dp"
-            app:layout_constraintTop_toTopOf="parent"/>
+    >
 
 
-    <ImageButton
-            android:id="@+id/btnFavorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_favorite_false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:contentDescription="@string/imageButtonDescription"/>
+        <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Luke Skywalker"
+                android:gravity="center"
+                android:textColor="@color/textColor"
+                android:textSize="20sp"
+                android:layout_marginTop="50dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+        />
 
 
-</android.support.constraint.ConstraintLayout>
+        <ImageButton
+                android:id="@+id/btnFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_favorite_false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="@string/imageButtonDescription"/>
+    </android.support.constraint.ConstraintLayout>
+
+
+    </RelativeLayout>

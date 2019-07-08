@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.util.ViewUtil
 
@@ -21,15 +23,8 @@ class RecyclerAdapter constructor(private var cardsList:ArrayList<FullInfoCard>,
     private var i:Int = 0
 
 
-
-
-
-
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): RecyclerViewHolder {
         val layoutView:View = LayoutInflater.from(parent.context).inflate(R.layout.card_item,null,false)
-        val lp= ConstraintLayout.LayoutParams(ViewUtil.pxFromDp(context,300),ViewUtil.pxFromDp(context,400))
-        lp.leftMargin = ViewUtil.pxFromDp(context,50)
-        layoutView.layoutParams = lp
         val rcv = RecyclerViewHolder(layoutView)
 
         return rcv

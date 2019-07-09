@@ -54,28 +54,28 @@ class FullCardFragment: Fragment() {
         }
 
         tvName = rootView.findViewById(R.id.tvName)
-        tvName.text = "Имя: "+fullCardObject!!.name
+        tvName.text = "Name: "+fullCardObject!!.name
 
         tvHeight = rootView.findViewById(R.id.tvHeight)
-        tvHeight.text = "Рост: "+fullCardObject!!.height
+        tvHeight.text = "Height: "+fullCardObject!!.height
 
         tvMass = rootView.findViewById(R.id.tvMass)
-        tvMass.text = "Вес: "+fullCardObject!!.mass
+        tvMass.text = "Weight: "+fullCardObject!!.mass
 
         tvHairColor = rootView.findViewById(R.id.tvHairColor)
-        tvHairColor.text = "Цвет волос: "+fullCardObject!!.hair_color
+        tvHairColor.text = "Hair color: "+fullCardObject!!.hair_color
 
         tvSkinColor = rootView.findViewById(R.id.tvSkinColor)
-        tvSkinColor.text = "Цвет кожи: "+fullCardObject!!.skin_color
+        tvSkinColor.text = "Skin color: "+fullCardObject!!.skin_color
 
         tvEyeColor = rootView.findViewById(R.id.tvEyeColor)
-        tvEyeColor.text = "Цвет глаз: "+fullCardObject!!.eye_color
+        tvEyeColor.text = "Eye color: "+fullCardObject!!.eye_color
 
         tvBirthYear = rootView.findViewById(R.id.tvBirthYear)
-        tvBirthYear.text = "День рождения: "+fullCardObject!!.birth_year
+        tvBirthYear.text = "Birthday: "+fullCardObject!!.birth_year
 
         tvGender = rootView.findViewById(R.id.tvGender)
-        tvGender.text = "Пол: "+fullCardObject!!.gender
+        tvGender.text = "Gender: "+fullCardObject!!.gender
 
         return rootView
     }

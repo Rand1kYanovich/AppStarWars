@@ -4,4 +4,7 @@
     <string name="imageButtonDescription">add Favorite Cards</string>
     <string name="etSearch_hint">Введите название</string>
     <string name="search_button_description">Search button</string>
+    <string name="item_starwars_title">starwars</string>
+    <string name="item_favorite_title">title</string>
+    <string name="actionbar_title">STARWARS</string>
 </resources>

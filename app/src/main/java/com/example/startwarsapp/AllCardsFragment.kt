@@ -17,7 +17,11 @@ import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
 import com.example.startwarsapp.util.FragmentUtil
 import com.example.startwarsapp.util.PaginationScrollListener
+import io.reactivex.Completable
+import io.reactivex.CompletableObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Action
 import io.reactivex.observers.DisposableMaybeObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
@@ -79,28 +83,35 @@ class AllCardsFragment : Fragment() {
                                override fun onError(e: Throwable?) {}
 
                                override fun onSuccess(t: FullInfoCard?) {
-                                    favoriteDao.delete(cardsList[position])
-                                    cardsList[position].isFavorite = false
-                                    btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+                                    Completable.fromAction(object :Action {
+                                        override fun run() {
+                                            favoriteDao.delete(cardsList[position])
+                                            cardsList[position].isFavorite = false
+
+                                        }
+                                    })
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe()
+
                                }
 
                                override fun onComplete() {
-                                    favoriteDao.insert(cardsList[position])
-                                    cardsList[position].isFavorite = true
-                                    btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+                                    Completable.fromAction(object :Action{
+                                        override fun run() {
+                                            favoriteDao.insert(cardsList[position])
+                                            cardsList[position].isFavorite = true
+
+                                        }
+                                    }).observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe()
+
+
                                }
                            })
-//                    if (favoriteDao.getById(cardsList.get(position).name) != null) {
-//                        cardsList.get(position).isFavorite = false
-//                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
-//                        favoriteDao.delete(cardsList.get(position))
-//                    } else if (favoriteDao.getById(cardsList.get(position).name) == null) {
-//                        cardsList.get(position).isFavorite = true
-//                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
-//                        favoriteDao.insert(
-//                            cardsList.get(position)
-//                        )
-//                    }
+               
+
 
 
             }

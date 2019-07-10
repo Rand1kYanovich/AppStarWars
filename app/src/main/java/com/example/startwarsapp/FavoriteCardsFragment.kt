@@ -1,11 +1,13 @@
 package com.example.startwarsapp
 
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat.invalidateOptionsMenu
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -14,8 +16,9 @@ import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.util.FragmentUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
+
+
+
 
 
 class FavoriteCardsFragment : Fragment() {
@@ -37,7 +40,7 @@ class FavoriteCardsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView: View = inflater.inflate(R.layout.fragment_favorite_cards, container, false)
-
+        setHasOptionsMenu(true)
         favoriteDao.getAll()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { t ->
@@ -48,7 +51,7 @@ class FavoriteCardsFragment : Fragment() {
         layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
 
-        recyclerView.setNestedScrollingEnabled(false)
+        recyclerView.isNestedScrollingEnabled = false
         recyclerView.setHasFixedSize(true)
 
         adapter = DataAdapter(favoriteList, context!!)
@@ -75,9 +78,17 @@ class FavoriteCardsFragment : Fragment() {
 
 
 
+
+
         return rootView
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        super.onPrepareOptionsMenu(menu)
+        val item = menu!!.findItem(R.id.action_favorite)
+        item.isVisible = false
+
+    }
     companion object {
         fun newInstance(): FavoriteCardsFragment {
             val fragment = FavoriteCardsFragment()

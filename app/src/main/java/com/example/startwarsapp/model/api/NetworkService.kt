@@ -6,21 +6,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class NetworkService {
-    private var mRetrofit: Retrofit?=null
+    private var mRetrofit: Retrofit? = null
 
-    companion object{
-        private var mInstance :NetworkService?= null
-        private val BASE_URL:String = "https://swapi.co/api/people/"
+    companion object {
+        private var mInstance: NetworkService? = null
+        private val BASE_URL: String = "https://swapi.co/api/"
 
-        fun getInstance():NetworkService {
-            if(mInstance==null) mInstance = NetworkService()
+        fun getInstance(): NetworkService {
+            if (mInstance == null) mInstance = NetworkService()
             return mInstance!!
         }
 
-        fun getOkHttpClient():OkHttpClient{
+        fun getOkHttpClient(): OkHttpClient {
             val logging = HttpLoggingInterceptor()
             logging.level = HttpLoggingInterceptor.Level.NONE
-            val okClient:OkHttpClient = OkHttpClient.Builder()
+            val okClient: OkHttpClient = OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .build()
             return okClient
@@ -37,7 +37,7 @@ class NetworkService {
             .build()
     }
 
-    fun getJSONApi():JSONPlaceHolderApi{
+    fun getJSONApi(): JSONPlaceHolderApi {
         return mRetrofit!!.create(JSONPlaceHolderApi::class.java)
     }
 

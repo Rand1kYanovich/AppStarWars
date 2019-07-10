@@ -2,23 +2,34 @@ package com.example.startwarsapp.model.entity
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import android.support.v7.util.DiffUtil
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 @Entity
-class FullInfoCard :Serializable{
+class FullInfoCard : Serializable {
 
     @PrimaryKey
-    var name:String = ""
+    var name: String = ""
 
-    var height:String = ""
-    var mass:String = ""
-    var hair_color:String = ""
-    var skin_color:String = ""
-    var eye_color: String = ""
-    var birth_year: String = ""
-    var gender:String = ""
-    var color:String = ""
+    var height: String = ""
+    var mass: String = ""
+
+    @SerializedName("hair_color")
+    @Expose
+    var hairColor: String = ""
+    @SerializedName("skin_color")
+    @Expose
+    var skinColor: String = ""
+    @SerializedName("eye_color")
+    @Expose
+    var eyeColor: String = ""
+    @SerializedName("birth_year")
+    @Expose
+    var birthYear: String = ""
+
+    var gender: String = ""
+    var color: String = ""
     var isFavorite = false
 
 

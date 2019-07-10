@@ -13,15 +13,15 @@ import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.util.FragmentUtil
 
-class FavoriteCardsFragment: Fragment() {
+class FavoriteCardsFragment : Fragment() {
 
     lateinit var recyclerView: RecyclerView
-    lateinit var adapter:RecyclerAdapter
+    lateinit var adapter: DataAdapter
     lateinit var layoutManager: LinearLayoutManager
 
-    var favoriteList:ArrayList<FullInfoCard>
-    var db:AppDatabase
-    var favoriteDao:FavoriteDao
+    var favoriteList: ArrayList<FullInfoCard>
+    var db: AppDatabase
+    var favoriteDao: FavoriteDao
 
     init {
         db = App.getInstance().getDB()
@@ -31,10 +31,12 @@ class FavoriteCardsFragment: Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView:View = inflater.inflate(R.layout.fragment_favorite_cards,container,false)
+        val rootView: View = inflater.inflate(R.layout.fragment_favorite_cards, container, false)
 
+        Thread(Runnable {
+            favoriteList = ArrayList(favoriteDao.getAll())
+        })
 
-        favoriteList = ArrayList(favoriteDao.getAll())
         recyclerView = rootView.findViewById(R.id.recyclerView)
         layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
@@ -42,9 +44,9 @@ class FavoriteCardsFragment: Fragment() {
         recyclerView.setNestedScrollingEnabled(false)
         recyclerView.setHasFixedSize(true)
 
-        adapter = RecyclerAdapter(favoriteList,context!!)
+        adapter = DataAdapter(favoriteList, context!!)
         adapter.setColorArray(resources.getStringArray(R.array.card_color))
-        adapter.setClickListener(object: OnItemClickListener{
+        adapter.setClickListener(object : OnItemClickListener {
             override fun onClick(view: View, position: Int, cardsList: ArrayList<FullInfoCard>) {
                 FragmentUtil.replaceWithBackStack(
                     activity!!.supportFragmentManager,
@@ -53,7 +55,7 @@ class FavoriteCardsFragment: Fragment() {
                 )
             }
         })
-        adapter.setFavoriteListener(object:OnFavoriteClickListener{
+        adapter.setFavoriteListener(object : OnFavoriteClickListener {
             override fun onFavoriteClickListener(
                 position: Int,
                 favoriteList: ArrayList<FullInfoCard>,
@@ -69,8 +71,8 @@ class FavoriteCardsFragment: Fragment() {
         return rootView
     }
 
-    companion object{
-        fun newInstance():FavoriteCardsFragment{
+    companion object {
+        fun newInstance(): FavoriteCardsFragment {
             val fragment = FavoriteCardsFragment()
             return fragment
         }

@@ -7,11 +7,12 @@ import android.widget.ImageButton
 import android.widget.TextView
 import com.example.startwarsapp.model.entity.FullInfoCard
 
-class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class DataViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    var tvName: TextView?=null
-    var clCard: ConstraintLayout?=null
-    var btnFavorite:ImageButton?=null
+    var tvName: TextView? = null
+    var clCard: ConstraintLayout? = null
+    var btnFavorite: ImageButton? = null
+
     init {
         clCard = itemView.findViewById(R.id.clCard)
         tvName = itemView.findViewById(R.id.tvName)
@@ -25,10 +26,10 @@ class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         cardsList: ArrayList<FullInfoCard>,
         favoriteClickListener: OnFavoriteClickListener,
         btnFavorite: ImageButton
-    ){
-        itemView.setOnClickListener { v -> clickListener.onClick(v!!,position,cardsList) }
+    ) {
+        itemView.setOnClickListener { v -> clickListener.onClick(v!!, position, cardsList) }
         this.btnFavorite!!.setOnClickListener {
-            favoriteClickListener.onFavoriteClickListener(position,cardsList, btnFavorite)
+            favoriteClickListener.onFavoriteClickListener(position, cardsList, btnFavorite)
         }
     }
 

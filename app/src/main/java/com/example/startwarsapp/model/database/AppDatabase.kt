@@ -1,7 +1,9 @@
 package com.example.startwarsapp.model.database
 
+
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
+
 import com.example.startwarsapp.model.entity.FullInfoCard
 
 

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,10 @@ import android.widget.TextView
 import com.example.startwarsapp.model.database.AppDatabase
 import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableMaybeObserver
+import io.reactivex.schedulers.Schedulers
+
 
 class FullCardFragment : Fragment() {
 
@@ -49,8 +54,25 @@ class FullCardFragment : Fragment() {
         btnFavorite.setBackgroundColor(Color.parseColor(fullCardObject.color))
 
         btnFavorite.setOnClickListener {
-            if (favoriteDao.getById(fullCardObject!!.name) != null) favoriteDao.delete(fullCardObject)
-            else if (favoriteDao.getById(fullCardObject!!.name) == null) favoriteDao.insert(fullCardObject)
+            favoriteDao.getById(fullCardObject.name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : DisposableMaybeObserver<FullInfoCard>() {
+                    override fun onError(e: Throwable?) {}
+
+                    override fun onSuccess(t: FullInfoCard?) {
+                        favoriteDao.delete(fullCardObject)
+                        fullCardObject.isFavorite = false
+                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+                    }
+
+                    override fun onComplete() {
+                        favoriteDao.insert(fullCardObject)
+                        fullCardObject.isFavorite = true
+                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+                    }
+                })
+
         }
 
         tvName = rootView.findViewById(R.id.tvName)

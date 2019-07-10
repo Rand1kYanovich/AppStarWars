@@ -17,6 +17,9 @@ import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.model.entity.InfoPageAndResult
 import com.example.startwarsapp.util.FragmentUtil
 import com.example.startwarsapp.util.PaginationScrollListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableMaybeObserver
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,17 +72,35 @@ class AllCardsFragment : Fragment() {
                 btnFavorite: ImageButton
             ) {
 
-                if (favoriteDao.getById(cardsList.get(position).name) != null) {
-                    cardsList.get(position).isFavorite = false
-                    btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!,R.drawable.ic_favorite_false))
-                    favoriteDao.delete(cardsList.get(position))
-                } else if (favoriteDao.getById(cardsList.get(position).name) == null) {
-                    cardsList.get(position).isFavorite = true
-                    btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!,R.drawable.ic_favorite_true))
-                    favoriteDao.insert(
-                        cardsList.get(position)
-                    )
-                }
+                       favoriteDao.getById(cardsList[position].name)
+                           .subscribeOn(Schedulers.io())
+                           .observeOn(AndroidSchedulers.mainThread())
+                           .subscribe(object : DisposableMaybeObserver<FullInfoCard>() {
+                               override fun onError(e: Throwable?) {}
+
+                               override fun onSuccess(t: FullInfoCard?) {
+                                    favoriteDao.delete(cardsList[position])
+                                    cardsList[position].isFavorite = false
+                                    btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+                               }
+
+                               override fun onComplete() {
+                                    favoriteDao.insert(cardsList[position])
+                                    cardsList[position].isFavorite = true
+                                    btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+                               }
+                           })
+//                    if (favoriteDao.getById(cardsList.get(position).name) != null) {
+//                        cardsList.get(position).isFavorite = false
+//                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+//                        favoriteDao.delete(cardsList.get(position))
+//                    } else if (favoriteDao.getById(cardsList.get(position).name) == null) {
+//                        cardsList.get(position).isFavorite = true
+//                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+//                        favoriteDao.insert(
+//                            cardsList.get(position)
+//                        )
+//                    }
 
 
             }

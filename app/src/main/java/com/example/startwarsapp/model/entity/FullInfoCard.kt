@@ -1,12 +1,13 @@
 package com.example.startwarsapp.model.entity
 
+
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-@Entity
+@Entity(tableName = "favoriteList")
 class FullInfoCard : Serializable {
 
     @PrimaryKey

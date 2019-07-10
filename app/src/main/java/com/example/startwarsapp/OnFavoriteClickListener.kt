@@ -5,5 +5,5 @@ import com.example.startwarsapp.model.entity.FullInfoCard
 
 interface OnFavoriteClickListener {
 
-    fun onFavoriteClickListener(position:Int,favoriteList:ArrayList<FullInfoCard>,btnFavorite:ImageButton)
+   fun onFavoriteClickListener(position:Int, favoriteList:ArrayList<FullInfoCard>, btnFavorite:ImageButton)
 }

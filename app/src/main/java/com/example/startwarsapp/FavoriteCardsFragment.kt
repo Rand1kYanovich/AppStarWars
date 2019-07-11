@@ -3,6 +3,7 @@ package com.example.startwarsapp
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat.invalidateOptionsMenu
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -15,10 +16,11 @@ import com.example.startwarsapp.model.database.AppDatabase
 import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
 import com.example.startwarsapp.util.FragmentUtil
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-
-
-
+import io.reactivex.functions.Action
+import io.reactivex.observers.DisposableMaybeObserver
+import io.reactivex.schedulers.Schedulers
 
 
 class FavoriteCardsFragment : Fragment() {
@@ -45,7 +47,6 @@ class FavoriteCardsFragment : Fragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { t ->
                 adapter.setList(ArrayList(t))
-                Log.e("Hi","f")
             }
         recyclerView = rootView.findViewById(R.id.recyclerView)
         layoutManager = LinearLayoutManager(context)
@@ -72,7 +73,47 @@ class FavoriteCardsFragment : Fragment() {
                 btnFavorite: ImageButton
             ) {
 
+                if(favoriteList[position].isFavorite)btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+                else btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+
+                favoriteDao.getById(favoriteList[position].name)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : DisposableMaybeObserver<FullInfoCard>() {
+                        override fun onError(e: Throwable?) {}
+
+                        override fun onSuccess(t: FullInfoCard?) {
+                            Completable.fromAction(object : Action {
+                                override fun run() {
+                                    favoriteDao.delete(favoriteList[position])
+                                    favoriteList[position].isFavorite = false
+
+                                }
+                            })
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe()
+
+                        }
+
+                        override fun onComplete() {
+                            Completable.fromAction(object : Action {
+                                override fun run() {
+                                    favoriteList[position].isFavorite = true
+                                    favoriteDao.insert(favoriteList[position])
+
+                                }
+                            }).observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe()
+
+
+                        }
+                    })
+
             }
+
+
         })
         recyclerView.adapter = adapter
 

@@ -75,6 +75,8 @@ class AllCardsFragment : Fragment() {
                 favoriteList: ArrayList<FullInfoCard>,
                 btnFavorite: ImageButton
             ) {
+                if(cardsList[position].isFavorite)btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+                else btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
 
                        favoriteDao.getById(cardsList[position].name)
                            .subscribeOn(Schedulers.io())
@@ -99,8 +101,8 @@ class AllCardsFragment : Fragment() {
                                override fun onComplete() {
                                     Completable.fromAction(object :Action{
                                         override fun run() {
-                                            favoriteDao.insert(cardsList[position])
                                             cardsList[position].isFavorite = true
+                                            favoriteDao.insert(cardsList[position])
 
                                         }
                                     }).observeOn(AndroidSchedulers.mainThread())
@@ -110,9 +112,6 @@ class AllCardsFragment : Fragment() {
 
                                }
                            })
-               
-
-
 
             }
         }

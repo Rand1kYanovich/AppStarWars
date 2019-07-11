@@ -13,14 +13,16 @@ import android.widget.TextView
 import com.example.startwarsapp.model.database.AppDatabase
 import com.example.startwarsapp.model.database.FavoriteDao
 import com.example.startwarsapp.model.entity.FullInfoCard
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Action
 import io.reactivex.observers.DisposableMaybeObserver
 import io.reactivex.schedulers.Schedulers
 
 
 class FullCardFragment : Fragment() {
 
-    lateinit var fullCardObject: FullInfoCard
+    var fullCardObject: FullInfoCard
     lateinit var clCard: ConstraintLayout
     lateinit var btnFavorite: ImageButton
     lateinit var tvName: TextView
@@ -53,7 +55,14 @@ class FullCardFragment : Fragment() {
         btnFavorite = rootView.findViewById(R.id.btnFavorite)
         btnFavorite.setBackgroundColor(Color.parseColor(fullCardObject.color))
 
+        if(fullCardObject.isFavorite) btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+        else btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+
         btnFavorite.setOnClickListener {
+
+            if(fullCardObject.isFavorite)btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+            else btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+
             favoriteDao.getById(fullCardObject.name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -61,15 +70,25 @@ class FullCardFragment : Fragment() {
                     override fun onError(e: Throwable?) {}
 
                     override fun onSuccess(t: FullInfoCard?) {
-                        favoriteDao.delete(fullCardObject)
-                        fullCardObject.isFavorite = false
-                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_false))
+                        Completable.fromAction(object : Action {
+                            override fun run() {
+                                favoriteDao.delete(fullCardObject)
+                                fullCardObject.isFavorite = false
+                            }
+                        }).observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .subscribe()
                     }
 
                     override fun onComplete() {
-                        favoriteDao.insert(fullCardObject)
+                        Completable.fromAction(object : Action {
+                            override fun run() {
                         fullCardObject.isFavorite = true
-                        btnFavorite.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_favorite_true))
+                        favoriteDao.insert(fullCardObject)
+                            }
+                        }).observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .subscribe()
                     }
                 })
 
